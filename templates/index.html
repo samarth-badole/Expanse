@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Expense Tracker</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --surface: #12121a;
+    --surface2: #1a1a26;
+    --border: #2a2a3d;
+    --accent: #7c6aff;
+    --accent2: #ff6a9e;
+    --green: #4fffb0;
+    --text: #e8e8f0;
+    --muted: #6b6b8a;
+    --mono: 'DM Mono', monospace;
+    --display: 'Syne', sans-serif;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--mono);
+    min-height: 100vh;
+    background-image: radial-gradient(ellipse 80% 50% at 50% -20%, rgba(124,106,255,0.15), transparent);
+  }
+
+  header {
+    padding: 2rem 2.5rem;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    backdrop-filter: blur(10px);
+    position: sticky;
+    top: 0;
+    background: rgba(10,10,15,0.8);
+    z-index: 100;
+  }
+
+  .logo {
+    font-family: var(--display);
+    font-size: 1.4rem;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .month-nav {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 0.8rem;
+    color: var(--muted);
+  }
+
+  .month-nav input[type="month"] {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 0.4rem 0.75rem;
+    border-radius: 6px;
+    font-family: var(--mono);
+    font-size: 0.8rem;
+    cursor: pointer;
+  }
+
+  .container { max-width: 1200px; margin: 0 auto; padding: 2rem 2.5rem; }
+
+  /* Stats Row */
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+  }
+
+  .stat-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.5rem;
+    position: relative;
+    overflow: hidden;
+    animation: fadeUp 0.4s ease both;
+  }
+
+  .stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+  }
+
+  .stat-label {
+    font-size: 0.7rem;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    margin-bottom: 0.5rem;
+  }
+
+  .stat-value {
+    font-family: var(--display);
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--text);
+  }
+
+  .stat-value.green { color: var(--green); }
+
+  /* Main Grid */
+  .main-grid {
+    display: grid;
+    grid-template-columns: 1fr 380px;
+    gap: 1.5rem;
+  }
+
+  @media (max-width: 900px) {
+    .main-grid { grid-template-columns: 1fr; }
+  }
+
+  /* Panel */
+  .panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    animation: fadeUp 0.4s ease both;
+  }
+
+  .panel-header {
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid var(--border);
+    font-family: var(--display);
+    font-size: 0.9rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  /* Add Form */
+  .add-form { padding: 1.5rem; display: flex; flex-direction: column; gap: 1rem; }
+
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+
+  label { font-size: 0.7rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; display: block; margin-bottom: 0.35rem; }
+
+  input, select, textarea {
+    width: 100%;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 0.6rem 0.9rem;
+    border-radius: 8px;
+    font-family: var(--mono);
+    font-size: 0.85rem;
+    transition: border-color 0.2s;
+    outline: none;
+  }
+
+  input:focus, select:focus, textarea:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(124,106,255,0.12);
+  }
+
+  select option { background: var(--surface2); }
+
+  textarea { resize: vertical; min-height: 60px; }
+
+  .btn {
+    padding: 0.7rem 1.5rem;
+    border-radius: 8px;
+    border: none;
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    letter-spacing: 0.03em;
+  }
+
+  .btn-primary {
+    background: linear-gradient(135deg, var(--accent), #5e4de8);
+    color: white;
+    width: 100%;
+  }
+
+  .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(124,106,255,0.35); }
+
+  /* Category Chart */
+  .cat-list { padding: 1rem 1.5rem; }
+
+  .cat-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.6rem 0;
+    border-bottom: 1px solid rgba(42,42,61,0.5);
+  }
+
+  .cat-item:last-child { border-bottom: none; }
+
+  .cat-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .cat-name { flex: 1; font-size: 0.82rem; color: var(--text); }
+
+  .cat-bar-wrap { width: 80px; height: 4px; background: var(--border); border-radius: 2px; overflow: hidden; }
+
+  .cat-bar { height: 100%; border-radius: 2px; transition: width 0.8s ease; }
+
+  .cat-amount { font-size: 0.8rem; color: var(--text); min-width: 70px; text-align: right; }
+
+  /* Expense List */
+  .expense-list { }
+
+  .expense-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid rgba(42,42,61,0.5);
+    transition: background 0.15s;
+    animation: fadeUp 0.3s ease both;
+  }
+
+  .expense-item:last-child { border-bottom: none; }
+  .expense-item:hover { background: rgba(124,106,255,0.04); }
+
+  .expense-icon {
+    width: 38px; height: 38px;
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.1rem;
+    flex-shrink: 0;
+  }
+
+  .expense-info { flex: 1; min-width: 0; }
+
+  .expense-title {
+    font-family: var(--display);
+    font-size: 0.9rem;
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .expense-meta { font-size: 0.72rem; color: var(--muted); margin-top: 0.15rem; }
+
+  .expense-amount {
+    font-family: var(--display);
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--accent2);
+    white-space: nowrap;
+  }
+
+  .del-btn {
+    background: none;
+    border: none;
+    color: var(--muted);
+    cursor: pointer;
+    font-size: 1rem;
+    padding: 0.25rem;
+    border-radius: 4px;
+    transition: color 0.2s;
+    line-height: 1;
+  }
+
+  .del-btn:hover { color: #ff5c5c; }
+
+  .empty-state {
+    padding: 3rem 1.5rem;
+    text-align: center;
+    color: var(--muted);
+    font-size: 0.85rem;
+  }
+
+  .empty-icon { font-size: 2.5rem; margin-bottom: 0.75rem; opacity: 0.4; }
+
+  /* Monthly trend */
+  .trend-row { padding: 1rem 1.5rem; display: flex; gap: 0.5rem; align-items: flex-end; height: 90px; }
+
+  .trend-bar-wrap { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 0.3rem; height: 100%; justify-content: flex-end; }
+
+  .trend-bar {
+    width: 100%;
+    background: linear-gradient(180deg, var(--accent), rgba(124,106,255,0.3));
+    border-radius: 4px 4px 0 0;
+    min-height: 4px;
+    transition: height 0.8s ease;
+  }
+
+  .trend-label { font-size: 0.6rem; color: var(--muted); }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .tag {
+    display: inline-block;
+    font-size: 0.65rem;
+    padding: 0.15rem 0.5rem;
+    border-radius: 4px;
+    font-family: var(--mono);
+    font-weight: 500;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">💸 SpendLens</div>
+  <div class="month-nav">
+    <span>Viewing:</span>
+    <input type="month" id="monthPicker" value="{{ current_month }}" onchange="location.href='/?month='+this.value">
+  </div>
+</header>
+
+<div class="container">
+
+  <!-- Stats -->
+  <div class="stats-row">
+    <div class="stat-card">
+      <div class="stat-label">Total Spent</div>
+      <div class="stat-value">₹{{ "%.0f"|format(total) }}</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Transactions</div>
+      <div class="stat-value">{{ expenses|length }}</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Avg per Transaction</div>
+      <div class="stat-value">₹{{ "%.0f"|format(total / expenses|length) if expenses else "0" }}</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Top Category</div>
+      <div class="stat-value" style="font-size:1.3rem;">
+        {% if cat_data %}{{ cat_data|sort(attribute='total', reverse=True)|first|attr('category') }}{% else %}—{% endif %}
+      </div>
+    </div>
+  </div>
+
+  <div class="main-grid">
+    <!-- Left: Expense List -->
+    <div>
+      <div class="panel">
+        <div class="panel-header">📋 Expenses — {{ current_month }}</div>
+        {% if expenses %}
+          <div class="expense-list">
+          {% for e in expenses %}
+          {% set icons = {'Food':'🍔','Transport':'🚗','Shopping':'🛍️','Bills':'⚡','Health':'❤️','Entertainment':'🎬','Education':'📚','Other':'📦'} %}
+          {% set colors = {'Food':'rgba(255,180,0,0.15)','Transport':'rgba(0,180,255,0.15)','Shopping':'rgba(255,106,158,0.15)','Bills':'rgba(255,200,0,0.15)','Health':'rgba(79,255,176,0.15)','Entertainment':'rgba(180,100,255,0.15)','Education':'rgba(100,200,255,0.15)','Other':'rgba(150,150,180,0.15)'} %}
+          <div class="expense-item">
+            <div class="expense-icon" style="background:{{ colors.get(e.category,'rgba(124,106,255,0.15)') }}">
+              {{ icons.get(e.category, '📦') }}
+            </div>
+            <div class="expense-info">
+              <div class="expense-title">{{ e.title }}</div>
+              <div class="expense-meta">{{ e.date }} &nbsp;·&nbsp; {{ e.category }}{% if e.note %} &nbsp;·&nbsp; {{ e.note[:30] }}{% endif %}</div>
+            </div>
+            <div class="expense-amount">₹{{ "%.0f"|format(e.amount) }}</div>
+            <form method="POST" action="/delete/{{ e.id }}" style="display:inline">
+              <button class="del-btn" type="submit" title="Delete">✕</button>
+            </form>
+          </div>
+          {% endfor %}
+          </div>
+        {% else %}
+          <div class="empty-state">
+            <div class="empty-icon">🧾</div>
+            <div>No expenses for {{ current_month }}</div>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Right: Add + Charts -->
+    <div style="display:flex;flex-direction:column;gap:1.5rem;">
+
+      <!-- Add Expense -->
+      <div class="panel">
+        <div class="panel-header">➕ Add Expense</div>
+        <form class="add-form" method="POST" action="/add">
+          <div>
+            <label>Title</label>
+            <input type="text" name="title" placeholder="e.g. Lunch at cafe" required>
+          </div>
+          <div class="form-row">
+            <div>
+              <label>Amount (₹)</label>
+              <input type="number" name="amount" placeholder="0" step="0.01" min="0" required>
+            </div>
+            <div>
+              <label>Date</label>
+              <input type="date" name="date" value="{{ current_month }}-01">
+            </div>
+          </div>
+          <div>
+            <label>Category</label>
+            <select name="category">
+              {% for cat in categories %}
+              <option>{{ cat }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div>
+            <label>Note (optional)</label>
+            <textarea name="note" placeholder="Any extra details..."></textarea>
+          </div>
+          <button class="btn btn-primary" type="submit">Add Expense</button>
+        </form>
+      </div>
+
+      <!-- Category Breakdown -->
+      {% if cat_data %}
+      <div class="panel">
+        <div class="panel-header">🗂️ By Category</div>
+        {% set max_cat = cat_data|sort(attribute='total',reverse=True)|first %}
+        <div class="cat-list">
+        {% set palette = ['#7c6aff','#ff6a9e','#4fffb0','#ffd06a','#6af0ff','#ff8c6a','#c06aff','#6aff9e'] %}
+        {% for row in cat_data|sort(attribute='total',reverse=True) %}
+        <div class="cat-item">
+          <div class="cat-dot" style="background:{{ palette[loop.index0 % palette|length] }}"></div>
+          <div class="cat-name">{{ row.category }}</div>
+          <div class="cat-bar-wrap">
+            <div class="cat-bar" style="width:{{ (row.total/max_cat.total*100)|int }}%;background:{{ palette[loop.index0 % palette|length] }}"></div>
+          </div>
+          <div class="cat-amount">₹{{ "%.0f"|format(row.total) }}</div>
+        </div>
+        {% endfor %}
+        </div>
+      </div>
+      {% endif %}
+
+      <!-- Monthly Trend -->
+      {% if monthly %}
+      <div class="panel">
+        <div class="panel-header">📈 Monthly Trend</div>
+        {% set max_month = monthly|sort(attribute='total',reverse=True)|first %}
+        <div class="trend-row">
+        {% for m in monthly|reverse %}
+        <div class="trend-bar-wrap">
+          <div class="trend-bar" style="height:{{ (m.total/max_month.total*60)|int }}px" title="₹{{ '%.0f'|format(m.total) }}"></div>
+          <div class="trend-label">{{ m.month[5:] }}</div>
+        </div>
+        {% endfor %}
+        </div>
+      </div>
+      {% endif %}
+
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

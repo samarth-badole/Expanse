@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>💸 SpendLens - Expense Tracker</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:ital,wght@0,400;0,500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0a0a0f;
+      --surface: #12121a;
+      --accent: #7c6aff;
+      --accent2: #ff6a9e;
+      --text: #e8e8f0;
+      --muted: #6b6b8a;
+    }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'DM Mono', monospace;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 2rem;
+      background-image: radial-gradient(ellipse 80% 50% at 50% -20%, rgba(124,106,255,0.15), transparent);
+    }
+    .logo {
+      font-family: 'Syne', sans-serif;
+      font-size: 3.5rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 1rem;
+      letter-spacing: -0.03em;
+    }
+    .tagline {
+      font-size: 1.1rem;
+      color: var(--muted);
+      margin-bottom: 2rem;
+    }
+    .badge {
+      background: var(--surface);
+      color: var(--text);
+      padding: 0.75rem 1.5rem;
+      border-radius: 8px;
+      border: 1px solid #2a2a3d;
+      font-size: 0.85rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      text-decoration: none;
+      transition: all 0.2s;
+    }
+    .badge:hover {
+      transform: translateY(-2px);
+      border-color: var(--accent);
+      box-shadow: 0 8px 24px rgba(124,106,255,0.2);
+    }
+    .note {
+      margin-top: 2.5rem;
+      font-size: 0.75rem;
+      color: var(--muted);
+      max-width: 480px;
+      line-height: 1.6;
+    }
+    .note code {
+      background: var(--surface);
+      padding: 0.15rem 0.4rem;
+      border-radius: 4px;
+      font-size: 0.7rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="logo">💸 SpendLens</div>
+  <div class="tagline">Track every rupee. Understand your spending.</div>
+  
+  <a href="https://samarth-badole.up.railway.app" class="badge" target="_blank">
+    🚀 Open Live App
+  </a>
+  
+  <div class="note">
+    This repository contains a <code>Flask</code> backend + <code>SQLite</code> database.<br>
+    GitHub Pages hosts static sites only. The app is deployed on Railway.
+  </div>
+</body>
+</html>

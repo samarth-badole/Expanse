@@ -1,10 +1,15 @@
 from flask import Flask, render_template, request, redirect, url_for, jsonify
 import sqlite3
-from datetime import datetime, date
 import os
+from datetime import datetime, date
 
 app = Flask(__name__)
-DB_PATH = "expenses.db"
+
+# Determine database path - use Railway volume if available for persistence
+if os.getenv('RAILWAY_VOLUME_PATH'):
+    DB_PATH = os.path.join(os.getenv('RAILWAY_VOLUME_PATH'), 'expenses.db')
+else:
+    DB_PATH = os.getenv('SQLITE_PATH', 'expenses.db')
 
 CATEGORIES = ["Food", "Transport", "Shopping", "Bills", "Health", "Entertainment", "Education", "Other"]
 
@@ -106,4 +111,5 @@ def api_stats():
 
 if __name__ == "__main__":
     init_db()
-    app.run(debug=True)
+    port = int(os.getenv('PORT', 5000))
+    app.run(host='0.0.0.0', port=port, debug=False)
