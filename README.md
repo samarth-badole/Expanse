@@ -1,8 +1,10 @@
-# SpendLens - Expense Tracker
+# 💸 SpendLens - Expense Tracker
 
-A beautiful, modern expense tracking web application built with Flask and SQLite.
+A beautiful, modern expense tracking app that runs entirely in your browser.
 
-## Features
+> **Note:** This is a **static site** hosted on GitHub Pages. All data is stored locally in your browser using `localStorage`.
+
+## ✨ Features
 
 - Add, view, and delete expenses
 - Categorize spending (Food, Transport, Shopping, Bills, Health, Entertainment, Education, Other)
@@ -11,121 +13,88 @@ A beautiful, modern expense tracking web application built with Flask and SQLite
 - Monthly trend charts
 - Indian Rupee (₹) currency support
 - Dark theme with gradient accents
+- Works offline - no internet required after first load
 
-## Tech Stack
+## 🚀 Live Demo
 
-- **Backend**: Flask (Python)
-- **Database**: SQLite
-- **Frontend**: Jinja2 templates, CSS3 with custom properties, vanilla JavaScript
-- **Deployment**: Railway / Render / PythonAnywhere
+**👉 [Open SpendLens](https://samarth-badole.github.io/Expanse/)**
 
-## Live Demo
+Hosted on GitHub Pages - loads instantly.
 
-**🚀 [Click here to use the live app](https://samarth-badole.up.railway.app)**
+## 📱 How to Use
 
-*(Deployed on Railway)*
+1. Open the app at the link above
+2. Add your first expense using the form on the right
+3. View your spending stats, category breakdown, and monthly trends
+4. Data is automatically saved in your browser
 
-## Local Development
+**Important**: Data is stored locally in your browser. Clearing browser data will erase all expenses. For backup, you can export your data (feature coming soon) or take screenshots.
 
-### Prerequisites
-- Python 3.9+
-- pip
+## 🛠️ Local Development
 
-### Setup
+Just open `index.html` in any modern browser. No build process required.
 
 ```bash
-# Navigate to the project
-cd expense-main/expense_tracker
+# Clone the repository
+git clone https://github.com/samarth-badole/Expanse.git
+cd Expanse
 
-# Install dependencies
-pip install -r requirements.txt
-
-# Initialize database (auto-runs on first request)
-python app.py
+# Open index.html in your browser, or use a local server
+python -m http.server 8000
+# Then visit http://localhost:8000
 ```
 
-Open http://localhost:5000 in your browser.
-
-## Deployment
-
-### Railway (Easiest - 1 click)
-
-1. Fork this repository
-2. Go to https://railway.app
-3. Click "New Project" → "Deploy from GitHub"
-4. Select your forked repo
-5. Done! Your app is live
-
-**Or manually:**
-```bash
-# Install Railway CLI
-pip install railway-cli
-
-# Login and deploy
-railway login
-railway init
-railway up
-```
-
-### Render
-
-1. Create account at render.com
-2. New Web Service → Connect GitHub repo
-3. Settings:
-   - Build Command: `pip install -r requirements.txt`
-   - Start Command: `gunicorn app:app`
-4. Deploy
-
-## File Structure
+## 📂 Project Structure
 
 ```
-expense_tracker/
-├── app.py                 # Flask application (routes, DB logic)
-├── expenses.db           # SQLite database (auto-created)
-├── requirements.txt      # Python dependencies
-├── Procfile              # Deployment configuration
-├── templates/
-│   └── index.html       # Main frontend template
-└── static_index.html    # Static landing page (GitHub Pages)
+Expanse/
+├── index.html        # Main app (self-contained HTML+CSS+JS)
+├── .gitignore        # Git ignore rules
+├── .nojekyll         # Disable Jekyll on GitHub Pages
+└── README.md         # This file
 ```
 
-## API Endpoints
+All code lives in a single `index.html` file for easy deployment.
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/` | Homepage with expense list |
-| POST | `/add` | Add new expense |
-| POST | `/delete/<id>` | Delete expense |
-| GET | `/api/stats?month=YYYY-MM` | JSON category breakdown |
+## 🌐 Deployment
 
-## Database Schema
+This site is automatically deployed to GitHub Pages whenever you push to the `main` branch.
 
-```sql
-CREATE TABLE expenses (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  title TEXT NOT NULL,
-  amount REAL NOT NULL,
-  category TEXT NOT NULL,
-  date TEXT NOT NULL,
-  note TEXT
-);
+**To enable GitHub Pages for your fork:**
+1. Go to repository Settings → Pages
+2. Source: Deploy from a branch → `main` → `/ (root)`
+3. Save
+4. Your site will be at: `https://<username>.github.io/Expanse/`
+
+## 📝 Technical Details
+
+- **Frontend**: Vanilla JavaScript (no frameworks)
+- **Storage**: Browser `localStorage` (key: `spendlens_expenses`)
+- **Styling**: CSS3 with custom properties, Flexbox & Grid
+- **Fonts**: Syne (display), DM Mono (monospace)
+- **No build step** - just edit and push
+
+### Data Format
+
+Expenses are stored as JSON in localStorage:
+
+```json
+[
+  {
+    "id": 1712345678901,
+    "title": "Lunch",
+    "amount": 350,
+    "category": "Food",
+    "date": "2026-05-01",
+    "note": "At cafe"
+  }
+]
 ```
 
-## Customization
+## 🔒 Privacy
 
-### Add new category
-Edit `CATEGORIES` list in `app.py` line 9.
+All data stays in your browser. No server, no tracking, no analytics.
 
-### Change currency
-Replace `₹` symbol in `templates/index.html` with your preferred currency.
-
-### Modify theme colors
-Edit CSS variables in `templates/index.html` under `:root`:
-```css
---accent: #7c6aff;    /* Primary purple */
---accent2: #ff6a9e;   /* Secondary pink */
-```
-
-## License
+## 📄 License
 
 MIT
