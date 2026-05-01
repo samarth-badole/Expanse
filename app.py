@@ -1,36 +1,68 @@
-from flask import Flask, render_template, request, redirect, url_for, jsonify
+from flask import Flask, render_template, request, redirect, url_for, jsonify, abort
 import sqlite3
 import os
 from datetime import datetime, date
 
 app = Flask(__name__)
 
-# Determine database path - use Railway volume if available for persistence
-if os.getenv('RAILWAY_VOLUME_PATH'):
-    DB_PATH = os.path.join(os.getenv('RAILWAY_VOLUME_PATH'), 'expenses.db')
-else:
-    DB_PATH = os.getenv('SQLITE_PATH', 'expenses.db')
+# Railway storage strategy
+# Railway provides ephermeral filesystem + optional persistent volumes
+# Use volume if available, otherwise fall back to /tmp (ephemeral but writable)
+RAILWAY_VOLUME = os.getenv('RAILWAY_VOLUME_PATH')
+RAILWAY_TEMP = os.getenv('RAILWAY_TEMP_DIR', '/tmp')
+
+def get_db_path():
+    """Resolve database path with Railway volume support."""
+    if RAILWAY_VOLUME:
+        # Persistent volume (survives restarts)
+        try:
+            os.makedirs(RAILWAY_VOLUME, exist_ok=True)
+            return os.path.join(RAILWAY_VOLUME, 'expenses.db')
+        except Exception as e:
+            print(f"[WARN] Cannot use volume: {e}, falling back to temp")
+    
+    # Ephemeral temp directory
+    try:
+        os.makedirs(RAILWAY_TEMP, exist_ok=True)
+        return os.path.join(RAILWAY_TEMP, 'expenses.db')
+    except:
+        # Last resort: current directory (may be read-only on some platforms)
+        return os.path.join(os.getcwd(), 'expenses.db')
+
+DB_PATH = get_db_path()
+print(f"[INFO] Database path: {DB_PATH}")
 
 CATEGORIES = ["Food", "Transport", "Shopping", "Bills", "Health", "Entertainment", "Education", "Other"]
 
 def get_db():
-    conn = sqlite3.connect(DB_PATH)
-    conn.row_factory = sqlite3.Row
-    return conn
+    try:
+        conn = sqlite3.connect(DB_PATH, timeout=30)
+        conn.row_factory = sqlite3.Row
+        conn.execute("PRAGMA journal_mode=WAL")
+        conn.execute("PRAGMA busy_timeout=5000")
+        return conn
+    except Exception as e:
+        print(f"[ERROR] Database connection failed: {e}")
+        raise
 
 def init_db():
-    with get_db() as conn:
-        conn.execute("""
-            CREATE TABLE IF NOT EXISTS expenses (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                title TEXT NOT NULL,
-                amount REAL NOT NULL,
-                category TEXT NOT NULL,
-                date TEXT NOT NULL,
-                note TEXT
-            )
-        """)
-        conn.commit()
+    try:
+        with get_db() as conn:
+            conn.execute("""
+                CREATE TABLE IF NOT EXISTS expenses (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    title TEXT NOT NULL,
+                    amount REAL NOT NULL,
+                    category TEXT NOT NULL,
+                    date TEXT NOT NULL,
+                    note TEXT
+                )
+            """)
+            conn.commit()
+        print(f"[INFO] Database initialized at {DB_PATH}")
+    except Exception as e:
+        print(f"[ERROR] Database init failed: {e}")
+        raise
 
 @app.route("/")
 def index():
